@@ -1,0 +1,348 @@
+# ================================
+# AUTO-MARKET PROJECT .GITIGNORE
+# ================================
+
+# ================================
+# SECURITY & SECRETS
+# ================================
+.env
+.env.local
+.env.production
+.env.staging
+*.key
+*.pem
+*.p12
+*.crt
+*.cer
+secrets/
+credentials/
+
+# API Keys & Tokens
+ebay_token.txt
+amazon_credentials.json
+openai_key.txt
+aws_credentials
+
+# ================================
+# PYTHON & DJANGO
+# ================================
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+PYTHONPATH
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Static files (collected)
+staticfiles/
+static/
+collected_static/
+
+# Media files (uploads)
+media/
+uploads/
+product_images/
+user_uploads/
+
+# Django migrations (uncomment if you want to ignore them)
+# */migrations/
+# !*/migrations/__init__.py
+
+# ================================
+# DEVELOPMENT TOOLS
+# ================================
+
+# Virtual Environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+pyvenv.cfg
+
+# IDE & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Testing
+.coverage
+.pytest_cache/
+.tox/
+.nox/
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# ================================
+# AI & ML MODELS
+# ================================
+
+# Model files
+*.pkl
+*.joblib
+*.h5
+*.hdf5
+*.pb
+*.onnx
+*.tflite
+models/
+checkpoints/
+trained_models/
+
+# ML Data
+datasets/
+data/
+*.csv
+*.json.large
+*.parquet
+*.feather
+
+# Transformers cache
+.cache/
+transformers_cache/
+huggingface_cache/
+
+# ================================
+# MARKETPLACE & API CACHE
+# ================================
+
+# eBay cache
+ebay_cache/
+ebay_responses/
+*.ebay
+
+# Amazon cache
+amazon_cache/
+amazon_responses/
+*.amazon
+
+# OpenAI cache
+openai_cache/
+ai_responses/
+
+# Temporary API files
+temp_api/
+api_temp/
+*.tmp
+*.temp
+
+# ================================
+# FRONTEND (if applicable)
+# ================================
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# React build
+build/
+dist/
+
+# ================================
+# DEPLOYMENT & PRODUCTION
+# ================================
+
+# Docker
+Dockerfile.prod
+docker-compose.override.yml
+.dockerignore
+
+# Server logs
+logs/
+*.log
+access.log
+error.log
+gunicorn.log
+
+# Backup files
+*.bak
+*.backup
+*.sql
+*.dump
+
+# Deployment scripts
+deploy.sh
+deploy_prod.sh
+fabfile.py
+
+# ================================
+# MONITORING & ANALYTICS
+# ================================
+
+# Monitoring files
+monitoring/
+metrics/
+alerts/
+
+# Performance profiling
+*.prof
+profile_results/
+
+# ================================
+# DOCUMENTATION BUILD
+# ================================
+
+# Sphinx documentation
+docs/_build/
+docs/_static/
+docs/_templates/
+
+# ================================
+# OPERATING SYSTEM
+# ================================
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ================================
+# PROJECT SPECIFIC
+# ================================
+
+# Test files
+test_*.py
+debug_*.py
+investigate_*.py
+
+# Temporary scripts
+temp_*.py
+quick_*.py
+test_*.html
+
+# Local development
+local_*.py
+dev_*.py
+
+# Jupyter notebooks (if used for analysis)
+*.ipynb
+
+# ================================
+# MARKETPLACE SPECIFIC FILES
+# ================================
+
+# eBay listing exports
+ebay_listings.csv
+ebay_products.json
+
+# Amazon listing exports
+amazon_listings.csv
+amazon_products.json
+
+# Product images backup
+image_backups/
+product_photos_backup/
+
+# Price analysis data
+price_analysis/
+market_data/
+
+# ================================
+# MISC
+# ================================
+
+# Compressed files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Temporary files
+*.tmp
+*.temp
+*_temp
+*_tmp
+
+# Lock files
+*.lock
+Pipfile.lock
+
+# Local configuration overrides
+local_config.py
+dev_config.py
+
+# Email templates (if containing sensitive info)
+email_templates_local/
+
+# Certificate files
+*.crt
+*.key
+*.pem
+*.p12
+*.pfx"
