@@ -30,61 +30,48 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-qqkt&s056=d84%(=7$zdvzl%z@
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
 # Environment detection
-ENVIRONMENT = os.getenv('ENVIRONMENT', 'development')
-IS_PRODUCTION = ENVIRONMENT == 'production'
+# ENVIRONMENT = os.getenv('ENVIRONMENT', 'production')
+# IS_PRODUCTION = ENVIRONMENT == 'production'
+# ENABLE_SSL = os.getenv('ENABLE_SSL', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = ['bluberryhq.com', 'www.bluberryhq.com', '10.10.12.15', '10.10.12.21', 'localhost', '127.0.0.1', 'testserver']
+# ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+ALLOWED_HOSTS = ['*']
 
-# Base URL for generating absolute URLs (for marketplace APIs)
-BASE_URL = os.getenv('BASE_URL', 'https://bluberryhq.com')
+# BASE_URL = os.getenv('BASE_URL', 'https://api.bluberryhq.com')
+# PUBLIC_BASE_URL = os.getenv('PUBLIC_BASE_URL', 'https://api.bluberryhq.com')
 
-# Public URL for eBay image access (must be publicly accessible)
-PUBLIC_BASE_URL = os.getenv('PUBLIC_BASE_URL', 'https://bluberryhq.com')
-
-# CSRF settings for cross-origin requests
-CSRF_TRUSTED_ORIGINS = [
-    'https://bluberryhq.com',
-    'https://www.bluberryhq.com',
-    'http://10.10.12.15:8000',
-    'http://10.10.12.15:3000', 
-    'http://10.10.12.15:3001',
-    'http://10.10.12.15:3002',
-    'http://10.10.12.21:8000',
-    'http://10.10.12.21:3000',
-    'http://10.10.12.21:3001', 
-    'http://10.10.12.21:3002',
-    'http://localhost:8000',
-    'http://localhost:3000',
-    'http://localhost:3001',
-    'http://localhost:3002',
-    'http://127.0.0.1:8000',
-    'http://127.0.0.1:3000',
-    'http://127.0.0.1:3001',
-    'http://127.0.0.1:3002',
+CORS_ALLOWED_ORIGINS = [
+    "https://bluberryhq.com",
+    "https://www.bluberryhq.com",
 ]
 
+# CSRF settings for cross-origin requests
+# CSRF_TRUSTED_ORIGINS = [
+#     'https://bluberryhq.com',
+#     'https://www.bluberryhq.com',
+#     'https://api.bluberryhq.com',
+# ]
 # Security settings - completely disabled for local development
-SECURE_SSL_REDIRECT = False
-SECURE_HSTS_SECONDS = 0
-SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-SECURE_HSTS_PRELOAD = False
-SECURE_CONTENT_TYPE_NOSNIFF = False
-SECURE_BROWSER_XSS_FILTER = False
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
-X_FRAME_OPTIONS = 'SAMEORIGIN'
+# SECURE_SSL_REDIRECT = ENABLE_SSL
+# SESSION_COOKIE_SECURE = ENABLE_SSL
+# CSRF_COOKIE_SECURE = ENABLE_SSL
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if ENABLE_SSL else None
+
+# X_FRAME_OPTIONS = 'SAMEORIGIN'
+# SECURE_CONTENT_TYPE_NOSNIFF = True
+# SECURE_BROWSER_XSS_FILTER = True
 
 # File upload settings
-FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB
-DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
-FILE_UPLOAD_PERMISSIONS = 0o644
+# FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB
+# DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
+# FILE_UPLOAD_PERMISSIONS = 0o644
 
 # Environment-specific overrides (only if needed in production)
-if IS_PRODUCTION and os.getenv('ENABLE_SSL', 'False').lower() == 'true':
-    SECURE_SSL_REDIRECT = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+# if IS_PRODUCTION and os.getenv('ENABLE_SSL', 'False').lower() == 'true':
+#     SECURE_SSL_REDIRECT = True
+#     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+#     SESSION_COOKIE_SECURE = True
+#     CSRF_COOKIE_SECURE = True
 
 
 # Application definition
@@ -106,6 +93,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -119,7 +107,7 @@ ROOT_URLCONF = 'auto_market.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -178,34 +166,37 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Additional locations of static files
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',  # Project-level static files
-]
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'static',  # Project-level static files
+# ]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 
 # Static files finders
-STATICFILES_FINDERS = [
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-]
+# STATICFILES_FINDERS = [
+#     'django.contrib.staticfiles.finders.FileSystemFinder',
+#     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+# ]
 
 # Ensure directories exist
-os.makedirs(STATIC_ROOT, exist_ok=True)
-if STATICFILES_DIRS:
-    for static_dir in STATICFILES_DIRS:
-        os.makedirs(static_dir, exist_ok=True)
+# os.makedirs(STATIC_ROOT, exist_ok=True)
+# if STATICFILES_DIRS:
+#     for static_dir in STATICFILES_DIRS:
+#         os.makedirs(static_dir, exist_ok=True)
 
 
 # Media files (User uploads like profile pictures and product images)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+
 
 # Ensure media directory exists
-os.makedirs(MEDIA_ROOT, exist_ok=True)
-os.makedirs(MEDIA_ROOT / 'product_images', exist_ok=True)
+# os.makedirs(MEDIA_ROOT, exist_ok=True)
+# os.makedirs(MEDIA_ROOT / 'product_images', exist_ok=True)
 
 # File upload settings
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
@@ -248,29 +239,29 @@ EMAIL_BACKEND = 'api.resend_backend.ResendEmailBackend'
 
 
 # Temporarily allow all origins for testing
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'https://bluberryhq.com,http://localhost:3000,http://127.0.0.1:3000').split(',')
+# CORS_ALLOW_ALL_ORIGINS = False
+# CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
+# CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-]
-CORS_ALLOW_METHODS = [
-    'DELETE',
-    'GET',
-    'OPTIONS',
-    'PATCH',
-    'POST',
-    'PUT',
-]
+# CORS_ALLOW_HEADERS = [
+#     'accept',
+#     'accept-encoding',
+#     'authorization',
+#     'content-type',
+#     'dnt',
+#     'origin',
+#     'user-agent',
+#     'x-csrftoken',
+#     'x-requested-with',
+# ]
+# CORS_ALLOW_METHODS = [
+#     'DELETE',
+#     'GET',
+#     'OPTIONS',
+#     'PATCH',
+#     'POST',
+#     'PUT',
+# ]
 
 # Marketplace API Credentials
 EBAY_CLIENT_ID = os.getenv('EBAY_CLIENT_ID', 'demo_client_id')

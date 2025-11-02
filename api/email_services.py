@@ -14,7 +14,113 @@ logger = logging.getLogger(__name__)
 class ItemSubmissionEmailService:
     """Service for sending item submission emails via Resend"""
     
-    # Customer email confirmation removed - admin only
+    @staticmethod
+    def send_customer_confirmation(user_email, user_name, submitted_items, contact_info):
+        """
+        Send confirmation email to customer about their item submission
+        """
+        try:
+            total_items = len(submitted_items)
+            total_estimated_value = sum(float(item.get('estimated_value', 0)) for item in submitted_items)
+            
+            # Create items list for customer
+            items_list = ""
+            for idx, item in enumerate(submitted_items, 1):
+                items_list += f"""
+                {idx}. {item.get('title', 'N/A')}
+                   - Estimated Value: ${float(item.get('estimated_value', 0)):.2f}
+                   - Condition: {item.get('condition', 'N/A').title()}
+                   - Confidence Level: {item.get('confidence', 'Medium').title()}
+                """
+            
+            # Pickup date formatting
+            pickup_date = contact_info.get('pickup_date', '')
+            if pickup_date:
+                from django.utils.dateparse import parse_datetime
+                try:
+                    if isinstance(pickup_date, str):
+                        pickup_dt = parse_datetime(pickup_date)
+                        if pickup_dt:
+                            pickup_date = pickup_dt.strftime('%B %d, %Y at %I:%M %p')
+                except:
+                    pass
+            
+            subject = f"✅ Submission Confirmed: {total_items} Items (${total_estimated_value:.2f})"
+            message = f"""
+Dear {user_name},
+
+Thank you for submitting your items to Auto Market! We have successfully received your submission and it is now under review.
+
+SUBMISSION CONFIRMATION
+==========================================
+
+Your Contact Information:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+👤 Name: {contact_info.get('full_name', 'N/A')}
+📧 Email: {contact_info.get('email', user_email or 'N/A')}
+📱 Phone: {contact_info.get('phone', 'N/A')}
+📅 Pickup Date: {pickup_date}
+📍 Pickup Address: {contact_info.get('pickup_address', 'N/A')}
+
+Submission Summary:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📦 Total Items: {total_items}
+💰 Total Estimated Value: ${total_estimated_value:.2f}
+📋 Privacy Policy: ✅ Accepted
+
+Your Submitted Items:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+{items_list}
+
+What Happens Next:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. 🔍 Our team will review and evaluate your items
+2. 📧 You'll receive an email with our approval decision
+3. 🤝 We'll contact you to confirm pickup details
+4. 🚚 Schedule pickup for approved items
+5. 💰 Items will be listed on eBay and Amazon
+6. 📊 You'll receive updates on sales and earnings
+
+Contact Information:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📧 Questions? Email us at: alecgold808@gmail.com
+🌐 Website: https://bluberryhq.com
+⏰ Response Time: Within 24 hours
+
+Thank you for choosing Auto Market for your marketplace needs!
+
+Best regards,
+The Auto Market Team
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+This confirmation was sent via Resend API
+Auto Market - Your Marketplace Solution
+            """
+            
+            # Send to customer using Resend
+            from django.core.mail import send_mail
+            
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [user_email],
+                fail_silently=False,
+            )
+            
+            logger.info(f"Customer confirmation sent for {total_items} item submission to {user_email}")
+            
+            return {
+                'success': True,
+                'message': 'Customer confirmation sent successfully'
+            }
+            
+        except Exception as e:
+            logger.error(f"Error sending customer confirmation: {str(e)}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
     
     @staticmethod
     def send_admin_notification(submitted_items, contact_info, user_email=None):
@@ -110,14 +216,24 @@ class ItemSubmissionEmailService:
 
 def send_item_submission_emails(user_email, user_name, submitted_items, contact_info):
     """
-    Main function to send ONLY admin notification emails (customer confirmation removed)
+    Main function to send both customer confirmation and admin notification emails
     """
     results = {
+        'customer_email': None,
         'admin_email': None
     }
     
     try:
-        # Send ONLY admin notification email  
+        # Send customer confirmation email
+        customer_result = ItemSubmissionEmailService.send_customer_confirmation(
+            user_email=user_email,
+            user_name=user_name,
+            submitted_items=submitted_items,
+            contact_info=contact_info
+        )
+        results['customer_email'] = customer_result
+        
+        # Send admin notification email  
         admin_result = ItemSubmissionEmailService.send_admin_notification(
             submitted_items=submitted_items,
             contact_info=contact_info,
@@ -130,5 +246,6 @@ def send_item_submission_emails(user_email, user_name, submitted_items, contact_
     except Exception as e:
         logger.error(f"Error in send_item_submission_emails: {str(e)}")
         return {
+            'customer_email': {'success': False, 'error': str(e)},
             'admin_email': {'success': False, 'error': str(e)}
         }

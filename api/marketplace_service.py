@@ -768,7 +768,7 @@ class MarketplaceService:
                         image_urls = []
                         for image in product.images.all():
                             # Create full URL - assume we're running on dev tunnel
-                            dev_tunnel_url = 'https://bluberryhq.com'
+                            dev_tunnel_url = 'https://api.bluberryhq.com'
                             image_url = f"{dev_tunnel_url}{image.image.url}"
                             image_urls.append(image_url)
                         
